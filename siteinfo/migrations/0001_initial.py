@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
                 ('google_maps_api_key', models.CharField(max_length=255, blank=True)),
                 ('google_analytics_id', models.CharField(help_text='Google Analytics Web Property-ID for this site.', max_length=20, blank=True)),
                 ('google_webmasters_verifytag', models.CharField(max_length=100, blank=True)),
-                ('site', models.ForeignKey(related_name='sitealias_settings', to='sites.Site')),
+                ('site', models.ForeignKey(related_name='sitealias_settings', to='sites.Site', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'site alias settings',
@@ -55,8 +55,8 @@ class Migration(migrations.Migration):
                 ('geoip_redirect', models.BooleanField(default=False, help_text='If GeoIP redirection is enabled for your deployment, visitors of this site are being redirected to the configured country sites.', verbose_name='GeoIP redirect')),
                 ('inactive_image', models.ImageField(help_text='Provide an image that will be displayed when the site is inactive', upload_to=b'uploads', verbose_name='inactive image', blank=True)),
                 ('inactive_text', models.TextField(help_text='This text will be displayed when the site is set to inactive', verbose_name='inactive text', blank=True)),
-                ('gtc_file', filer.fields.file.FilerFileField(blank=True, to='filer.File', help_text='Provide your "General Terms and Conditions" document for download.', null=True, verbose_name='GTC')),
-                ('site', models.ForeignKey(related_name='site_settings', to='sites.Site', unique=True)),
+                ('gtc_file', filer.fields.file.FilerFileField(blank=True, to='filer.File', help_text='Provide your "General Terms and Conditions" document for download.', null=True, verbose_name='GTC', on_delete=models.SET_NULL)),
+                ('site', models.ForeignKey(related_name='site_settings', to='sites.Site', unique=True, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'site settings',

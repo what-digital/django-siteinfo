@@ -3,7 +3,6 @@ import datetime
 import warnings
 from django.db import models
 from django.contrib.sites.models import Site
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 from filer.fields.file import FilerFileField
@@ -31,9 +30,8 @@ REQUIRE_LOGIN_CHOICES = (
     ('staff', _('staff login required')),
 )
 
-@python_2_unicode_compatible
 class SiteSettings(models.Model):
-    site = models.ForeignKey(Site, related_name='site_settings', unique=True)
+    site = models.ForeignKey(Site, related_name='site_settings', unique=True, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
     active_start = models.DateTimeField(null=True, blank=True)
     active_end = models.DateTimeField(null=True, blank=True)
@@ -64,7 +62,7 @@ class SiteSettings(models.Model):
     phone = models.CharField(_('phone'), max_length=17, blank=True)
     phone_mobile = models.CharField(_('mobile phone'), max_length=17, blank=True)
     fax = models.CharField(_('fax'), max_length=17, blank=True)
-    gtc_file = FilerFileField(verbose_name=_('GTC'), help_text=_('Provide your "General Terms and Conditions" document for download.'), blank=True, null=True)
+    gtc_file = FilerFileField(verbose_name=_('GTC'), help_text=_('Provide your "General Terms and Conditions" document for download.'), blank=True, null=True, on_delete=models.SET_NULL)
     imprint = models.TextField(_('imprint'), help_text=_('This imprint may be displayed at the bottom of your webpages.'), blank=True)
     favicon = models.FileField(_('favicon'), help_text=_('Provide an image (Windows icon image, 16 x 16 pixels) which is used in browser bookmarks and such.'), upload_to="uploads", blank=True)
     require_login = models.CharField(_('require login'), help_text=_('Choose if a valid login is needed to view this site'), choices=REQUIRE_LOGIN_CHOICES, max_length=10, blank=True)
@@ -79,7 +77,7 @@ class SiteSettings(models.Model):
         verbose_name_plural = _('site settings')
 
     def __str__(self):
-        return _(u'for site %s') % unicode(self.site)
+        return _(u'for site %s') % str(self.site)
 
     def get_full_address(self, separator="<br />"):
         address = "%s%s%s %s" % (self.address, separator, self.zip_code or "", self.city)
@@ -129,9 +127,8 @@ class SiteSettings(models.Model):
         return getattr(self.gtc_file, 'file', None)
 
 
-@python_2_unicode_compatible
 class SiteAliasSettings(models.Model):
-    site = models.ForeignKey(Site, related_name='sitealias_settings')
+    site = models.ForeignKey(Site, related_name='sitealias_settings', on_delete=models.CASCADE)
     domain_alias = models.CharField(max_length=100, unique=True, help_text=_('Without www.'))
     google_maps_api_key = models.CharField(max_length=255, blank=True)
     google_analytics_id = models.CharField(max_length=20, help_text=_('Google Analytics Web Property-ID for this site.'), blank=True)

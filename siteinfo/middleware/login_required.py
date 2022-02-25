@@ -29,11 +29,11 @@
 
 import re
 from django.conf import settings
-from django.contrib.auth.views import login
+from django.contrib.auth.views import LoginView
 from django.http import HttpResponseRedirect
 from siteinfo.models import SiteSettings
 
-class RequireLoginMiddleware(object):
+class RequireLoginMiddleware:
     """
     Require Login middleware. If enabled, each Django-powered page will
     require authentication for all urls except 
@@ -46,7 +46,8 @@ class RequireLoginMiddleware(object):
     validation on these set SERVE_STATIC_TO_PUBLIC to False.
     """
 
-    def __init__(self):
+    def __init__(self, get_response=None):
+        self.get_response = get_response
         self.login_url = getattr(settings, 'LOGIN_URL', '/accounts/login/' )
         public_urls = []
         
@@ -63,7 +64,7 @@ class RequireLoginMiddleware(object):
             ])
         self.public_urls = tuple(public_urls)
 
-    def process_request(self, request):
+    def __call__(self, request):
         """
         Redirect anonymous users to login_url from non public urls
 
@@ -83,10 +84,11 @@ class RequireLoginMiddleware(object):
                 for url in self.public_urls:
                     if url.match(request.path[1:]):
                         return None
-                if request.user.is_anonymous() or require_login == 'staff' and not request.user.is_staff:
+                if not request.user.is_authenticated or require_login == 'staff' and not request.user.is_staff:
                     if request.POST:
-                        return login(request)
+                        return LoginView.as_view()(request)
                     else:
                         return HttpResponseRedirect("%s?next=%s" % (self.login_url, request.path))
         except AttributeError:
             return HttpResponseRedirect("%s?next=%s" % (self.login_url, request.path))
+        return self.get_response(request)
