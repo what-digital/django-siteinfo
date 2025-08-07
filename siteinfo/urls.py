@@ -1,8 +1,5 @@
 
-try:
-    from django.conf.urls import patterns, url
-except ImportError:
-    from django.conf.urls.defaults import patterns, url
+from django.urls import re_path
 
 from django.conf import settings
 
@@ -17,9 +14,9 @@ else:
 
 
 urlpatterns = [
-    url(r'^login/$', 'django.contrib.auth.views.login', name='login_url'),
-    url(r'^logout/$', 'django.contrib.auth.views.logout', name='logout_url'),
-    url(r'^agb/?$', "django.views.generic.simple.redirect_to", {'url': agb_url}, name="agb"),
-    url(r'^srs/?$', 'siteinfo.views.set_redirect_stop', name='set_redirect_stop'),
-    url(r'^test_offline_page/?$', 'siteinfo.views.test_offline_page', name='siteinfo-test_offline_page'),
+    re_path(r'^login/$', 'django.contrib.auth.views.login', name='login_url'),
+    re_path(r'^logout/$', 'django.contrib.auth.views.logout', name='logout_url'),
+    re_path(r'^agb/?$', "django.views.generic.simple.redirect_to", {'url': agb_url}, name="agb"),
+    re_path(r'^srs/?$', 'siteinfo.views.set_redirect_stop', name='set_redirect_stop'),
+    re_path(r'^test_offline_page/?$', 'siteinfo.views.test_offline_page', name='siteinfo-test_offline_page'),
 ]
